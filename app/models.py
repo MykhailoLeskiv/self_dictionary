@@ -1,5 +1,5 @@
 from flask_login import UserMixin
-
+from datetime import datetime
 from app import db, login
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -35,3 +35,26 @@ class Dictionary(db.Model):
 
     def __repr__(self):
         return '<{} - {} dictionary>'.format(self.native_lang, self.foreign_lang)
+
+
+class Chapter(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    dictionary = db.Column(db.Integer,  db.ForeignKey('dictionary.id'))
+    created_datetime = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    chapter_name = db.Column(db.String(32), index=True, unique=True)
+
+    def __repr__(self):
+        return '<Chapter name is {}>'.format(self.chapter_name)
+
+
+class Word(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    chapter = db.Column(db.Integer,  db.ForeignKey('chapter.id'))
+    word = db.Column(db.String(64))
+    translation = db.Column(db.String(64))
+    created_datetime = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+
+    def __rerp__(self):
+        return '<{} - {}>'.format(self.word,self.translation)
