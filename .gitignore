@@ -105,3 +105,6 @@ venv.bak/
 
 # Ignore user-specific pycharm settings
 .idea/
+
+# Ignore test database
+.app/test.db
