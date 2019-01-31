@@ -56,5 +56,5 @@ class Word(db.Model):
     translation = db.Column(db.String(64), nullable=False)
     created_datetime = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
-    def __rerp__(self):
+    def __repr__(self):
         return '<{} - {}>'.format(self.word,self.translation)
