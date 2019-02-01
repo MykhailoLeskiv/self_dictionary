@@ -107,4 +107,4 @@ venv.bak/
 .idea/
 
 # Ignore test database
-.app/test.db
+app/test.db
