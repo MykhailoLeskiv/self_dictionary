@@ -112,8 +112,7 @@ class TestChapter(ModelTestMixin):
         self.refresh_db(chapter_1,chapter_2, self.dictionary)
         yield db
         assert db.session.query(Chapter) == 2
-
-<<<<<<< HEAD
+        
 class TestWord(ModelTestMixin):
 
     def setUp(self):
@@ -142,37 +141,6 @@ class TestWord(ModelTestMixin):
         db.session.commit()
         yield db
         assert db.session.query(Word).count() == 0
-
-=======
-    class TestWord(ModelTestMixin):
-
-        def setUp(self):
-            self.user = User(email='test@test.com', username='test', password='test')
-            self.dictionary = Dictionary(user=self.user, native_lang='spanish', foreign_lang='english')
-            self.chapter = Chapter(dictionary=self.dictionary, chapter_name='food')
-            super().setUp()
-
-        def test_word_single_create(self):
-            word = Word(chapter=self.chapter, word='їжа', translation='food')
-            self.refresh_db(word)
-            yield db
-            assert db.session.query(Word).count() == 1
-
-        def test_word_multiple_create(self):
-            word_1 = Word(chapter=self.chapter, word='їжа', translation='food')
-            word_2 = Word(chapter=self.chapter, word='хліб', translation='bread')
-            self.refresh_db(word_1, word_2, self.chapter)
-            yield db
-            assert db.session.query(Word) == 2
-
-        def test_delete_word(self):
-            word = Word(chapter=self.chapter, word='хліб', translation='bread')
-            self.refresh_db(word)
-            db.session.delete(word)
-            db.session.commit()
-            yield db
-            assert db.session.query(Word).count() == 0
->>>>>>> 72b84b3a4f64ea8f4d37d393f00c502268cdd9dd
 
 if __name__ == '__main__':
     unittest.main()
