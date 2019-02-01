@@ -72,7 +72,7 @@ class TestDictionary(ModelTestMixin):
     def test_dictionary_multiple_create(self):
         dictionary_1 = Dictionary(user=self.user, native_lang='spanish', foreign_lang='english')
         dictionary_2 = Dictionary(user=self.user, native_lang='ukrainian', foreign_lang='french')
-        self.refresh_db(dictionary_1,dictionary_2,self.user)
+        self.refresh_db(dictionary_1, dictionary_2, self.user)
         yield db
         assert db.session.query(Dictionary) == 2
 
@@ -82,7 +82,6 @@ class TestDictionary(ModelTestMixin):
         yield db
         assert dictionary.native_lang == 'ukrainian'
         assert dictionary.foreign_lang == 'english'
-
 
     def test_delete_dictionary(self):
         dictionary = Dictionary(user=self.user, native_lang='spanish', foreign_lang='english')
@@ -109,10 +108,11 @@ class TestChapter(ModelTestMixin):
     def test_chapter_multiple_create(self):
         chapter_1 = Chapter(dictionary=self.dictionary, chapter_name='food')
         chapter_2 = Chapter(dictionary=self.dictionary, chapter_name='hobby')
-        self.refresh_db(chapter_1,chapter_2, self.dictionary)
+        self.refresh_db(chapter_1, chapter_2, self.dictionary)
         yield db
         assert db.session.query(Chapter) == 2
-        
+
+
 class TestWord(ModelTestMixin):
 
     def setUp(self):
@@ -141,6 +141,7 @@ class TestWord(ModelTestMixin):
         db.session.commit()
         yield db
         assert db.session.query(Word).count() == 0
+
 
 if __name__ == '__main__':
     unittest.main()

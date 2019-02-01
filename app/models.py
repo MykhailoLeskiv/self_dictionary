@@ -1,6 +1,6 @@
 from flask_login import UserMixin
 from datetime import datetime
-from app import db, login
+from app import db, login, ma
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
@@ -58,3 +58,9 @@ class Word(db.Model):
 
     def __repr__(self):
         return '<{} - {}>'.format(self.word,self.translation)
+
+
+class DictionarySchema(ma.ModelSchema):
+
+    class Meta:
+        model = Dictionary

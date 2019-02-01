@@ -1,9 +1,10 @@
 from flask_login import current_user, login_user, logout_user, login_required
 
-from app import app, db
-from flask import render_template, flash, redirect, url_for, request
+from app import app, db, api
+from flask import render_template, flash, redirect, url_for, request, Blueprint
 from app.forms import LoginForm, RegistrationForm
 from app.models import User
+from app.resources import DictionaryList
 
 
 @app.route('/')
@@ -52,3 +53,7 @@ def register():
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
+
+
+api.add_resource(DictionaryList, '/dictionary')
+api.init_app(app)
