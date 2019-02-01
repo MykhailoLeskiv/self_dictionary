@@ -69,6 +69,89 @@ class TestDictionary(ModelTestMixin):
         yield db
         assert db.session.query(Dictionary).count() == 1
 
+    def test_dictionary_multiple_create(self):
+        dictionary_1 = Dictionary(user=self.user, native_lang='spanish', foreign_lang='english')
+        dictionary_2 = Dictionary(user=self.user, native_lang='ukrainian', foreign_lang='french')
+        self.refresh_db(dictionary_1,dictionary_2,self.user)
+        yield db
+        assert db.session.query(Dictionary) == 2
+
+    def test_dictionary_filds(self):
+        dictionary = Dictionary(user=self.user, native_lang='ukrainian', foreign_lang='english')
+        self.refresh_db(dictionary)
+        yield db
+        assert dictionary.native_lang == 'ukrainian'
+        assert dictionary.foreign_lang == 'english'
+
+
+    def test_delete_dictionary(self):
+        dictionary = Dictionary(user=self.user, native_lang='spanish', foreign_lang='english')
+        self.refresh_db(dictionary)
+        db.session.delete(dictionary)
+        db.session.commit()
+        yield db
+        assert db.session.query(Dictionary).count() == 0
+
+
+class TestChapter(ModelTestMixin):
+
+    def setUp(self):
+        self.user = User(email='test@test.com', username='test', password='test')
+        self.dictionary = Dictionary(user=self.user, native_lang='spanish', foreign_lang='english')
+        super().setUp()
+
+    def test_chapter_single_create(self):
+        chapter = Chapter(dictionary=self.dictionary, chapter_name='food')
+        self.refresh_db(chapter)
+        yield db
+        assert db.session.query(Chapter).count() == 1
+
+    def test_chapter_multiple_create(self):
+        chapter_1 = Chapter(dictionary=self.dictionary, chapter_name='food')
+        chapter_2 = Chapter(dictionary=self.dictionary, chapter_name='hobby')
+        self.refresh_db(chapter_1,chapter_2, self.dictionary)
+        yield db
+        assert db.session.query(Chapter) == 2
+
+    class TestWord(ModelTestMixin):
+
+        def setUp(self):
+            self.user = User(email='test@test.com', username='test', password='test')
+            self.dictionary = Dictionary(user=self.user, native_lang='spanish', foreign_lang='english')
+            self.chapter = Chapter(dictionary=self.dictionary, chapter_name='food')
+            super().setUp()
+
+        def test_word_single_create(self):
+            word = Word(chapter=self.chapter, word='їжа', translation='food')
+            self.refresh_db(word)
+            yield db
+            assert db.session.query(Word).count() == 1
+
+        def test_word_multiple_create(self):
+            word_1 = Word(chapter=self.chapter, word='їжа', translation='food')
+            word_2 = Word(chapter=self.chapter, word='хліб', translation='bread')
+            self.refresh_db(word_1, word_2, self.chapter)
+            yield db
+            assert db.session.query(Word) == 2
+
+        def test_delete_word(self):
+            word = Word(chapter=self.chapter, word='хліб', translation='bread')
+            self.refresh_db(word)
+            db.session.delete(word)
+            db.session.commit()
+            yield db
+            assert db.session.query(Word).count() == 0
+
+
+
+
+
+
+
+
+
+
+
 
 if __name__ == '__main__':
     unittest.main()
