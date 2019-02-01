@@ -142,16 +142,5 @@ class TestChapter(ModelTestMixin):
             yield db
             assert db.session.query(Word).count() == 0
 
-
-
-
-
-
-
-
-
-
-
-
 if __name__ == '__main__':
     unittest.main()
