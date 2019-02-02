@@ -2,7 +2,7 @@ from flask_restful import Resource
 
 from app.models import Dictionary, DictionarySchema
 
-dictionary_schema = DictionarySchema()
+dictionary_schema = DictionarySchema(many=True)
 
 
 class DictionaryList(Resource):
