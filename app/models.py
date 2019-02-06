@@ -1,6 +1,7 @@
+from flask_admin.contrib.sqla import ModelView
 from flask_login import UserMixin
 from datetime import datetime
-from app import db, login, ma
+from app import db, login, ma, admin
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
@@ -58,6 +59,12 @@ class Word(db.Model):
 
     def __repr__(self):
         return '<{} - {}>'.format(self.word,self.translation)
+
+
+admin.add_view(ModelView(User, db.session))
+admin.add_view(ModelView(Dictionary, db.session))
+admin.add_view(ModelView(Chapter, db.session))
+admin.add_view(ModelView(Word, db.session))
 
 
 class DictionarySchema(ma.ModelSchema):
