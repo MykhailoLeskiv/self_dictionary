@@ -60,11 +60,34 @@ class Word(db.Model):
     def __repr__(self):
         return '<{} - {}>'.format(self.word,self.translation)
 
+class DictionaryAdminPageView(ModelView):
+    column_display_pk = True
+    column_hide_backrefs = False
+    column_display_all_relations = True
+    form_columns = ('user', 'native_lang', 'foreign_lang')
+    column_list = ('user', 'native_lang', 'foreign_lang')
+
+class ChapterAdminPageView(ModelView):
+    column_display_pk = True
+    column_hide_backrefs = False
+    column_display_all_relations = True
+    form_columns = ('dictionary', 'chapter_name')
+    column_list = ('dictionary', 'chapter_name')
+
+class WordAdminPageView(ModelView):
+    column_display_pk = True
+    column_hide_backrefs = False
+    column_display_all_relations = True
+    form_columns = ('chapter', 'word', 'translation')
+    column_list = ('chapter', 'word', 'translation')
+
+
+
 
 admin.add_view(ModelView(User, db.session))
-admin.add_view(ModelView(Dictionary, db.session))
-admin.add_view(ModelView(Chapter, db.session))
-admin.add_view(ModelView(Word, db.session))
+admin.add_view(DictionaryAdminPageView(Dictionary, db.session))
+admin.add_view(ChapterAdminPageView(Chapter, db.session))
+admin.add_view(WordAdminPageView(Word, db.session))
 
 
 class DictionarySchema(ma.ModelSchema):
