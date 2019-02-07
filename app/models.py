@@ -3,6 +3,7 @@ from flask_login import UserMixin
 from datetime import datetime
 from app import db, login, ma, admin
 from werkzeug.security import generate_password_hash, check_password_hash
+from marshmallow import fields
 
 
 @login.user_loader
@@ -82,15 +83,28 @@ class WordAdminPageView(ModelView):
     column_list = ('chapter', 'word', 'translation')
 
 
-
-
 admin.add_view(ModelView(User, db.session))
 admin.add_view(DictionaryAdminPageView(Dictionary, db.session))
 admin.add_view(ChapterAdminPageView(Chapter, db.session))
 admin.add_view(WordAdminPageView(Word, db.session))
 
 
-class DictionarySchema(ma.ModelSchema):
+class DictionarySchema(ma.Schema):
+    id = fields.Integer()
+    user = fields.Integer()
+    native_lang = fields.String(required=True)
+    foreign_lang = fields.String(required=True)
 
-    class Meta:
-        model = Dictionary
+
+class UserSchema(ma.Schema):
+    id = fields.Integer()
+    username = fields.String()
+    email = fields.String()
+    password = fields.String()
+
+
+class ChapterSchema(ma.Schema):
+    id = fields.Integer()
+    dictionary = fields.Integer()
+    created_datetime = fields.DateTime()
+    chapter_name = fields.String()
