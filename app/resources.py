@@ -147,3 +147,10 @@ class ChapterApi(Resource):
         Chapter.query.filter_by(id=json_data['id']).delete()
         db.session.commit()
         return {"status": 'success', 'data': {}}, 204
+
+
+class GetUserApi(Resource):
+    def get(self, user_id):
+        user = User.query.filter_by(id=user_id).first()
+        user = user_schema.dump(user).data
+        return {'status': 'success', 'data': user}, 200
