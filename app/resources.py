@@ -14,6 +14,7 @@ words_schema = WordSchema(many=True)
 word_schema = WordSchema()
 
 
+
 class DictionaryApi(Resource):
 
     def get(self, user_id):
@@ -31,7 +32,7 @@ class DictionaryApi(Resource):
         result = dictionary_schema.dump(dictionary).data
         return {"status": 'success', 'data': result}, 201
 
-    def put(self, user_id):
+    def put(self):
         json_data = request.get_json(force=True)
         if not json_data:
             return {'message': 'No input data provided'}, 400
@@ -111,32 +112,28 @@ class GetUserApi(Resource):
 
 
 class ChapterApi(Resource):
+
     def get(self, user_id, dictionary_id):
         chapters = Chapter.query.filter_by(dictionary=dictionary_id)
-
         chapters = chapters_schema.dump(chapters).data
         return {'status': 'success', 'data': chapters}, 200
 
-    def post(self, user_id, dictionary_id):
+    def post(self, dictionary_id):
         json_data = request.get_json(force=True)
         if not json_data:
             return {'message': 'No input data provided'}, 400
-        # Validate and deserialize input
-        data, errors = user_schema.load(json_data)
-        if errors:
-            return errors, 422
-        chapter = Chapter.query.filter_by(id=data['id']).first()
+        chapter = Chapter.query.filter_by(id=json_data['id']).first()
         if chapter:
             return {'message': 'Chapter already exists'}, 400
         chapter = Chapter(
-            dictionary=json_data['dictionary'], chapter_name=json_data['chapter_name'])
+            dictionary=dictionary_id, chapter_name=json_data['chapter_name'])
 
         db.session.add(chapter)
         db.session.commit()
         result = chapter_schema.dump(chapter).data
         return {"status": 'success', 'data': result}, 201
 
-    def put(self, user_id, dictionary_id):
+    def put(self):
         json_data = request.get_json(force=True)
         if not json_data:
             return {'message': 'No input data provided'}, 400
@@ -148,7 +145,7 @@ class ChapterApi(Resource):
         result = chapter_schema.dump(chapter).data
         return {"status": 'success', 'data': result}, 200
 
-    def delete(self, user_id, dictionary_id):
+    def delete(self):
         json_data = request.get_json(force=True)
         if not json_data:
             return {'message': 'No input data provided'}, 400
