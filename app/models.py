@@ -108,3 +108,10 @@ class ChapterSchema(ma.Schema):
     dictionary = fields.Integer()
     created_datetime = fields.DateTime()
     chapter_name = fields.String()
+
+class WordSchema(ma.Schema):
+    id = fields.Integer()
+    chapter = fields.Integer()
+    word = fields.String()
+    translation = fields.String()
+    created_datetime = fields.DateTime()

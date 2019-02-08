@@ -4,7 +4,7 @@ from app import app, db, api
 from flask import render_template, flash, redirect, url_for, request, Blueprint
 from app.forms import LoginForm, RegistrationForm
 from app.models import User
-from app.resources import DictionaryApi, UserApi, ChapterApi, GetUserApi
+from app.resources import DictionaryApi, UserApi, ChapterApi, GetUserApi, WordApi
 
 
 @app.route('/')
@@ -59,5 +59,5 @@ api.add_resource(DictionaryApi, '/users/<int:user_id>/dictionaries')
 api.add_resource(GetUserApi, '/users/<int:user_id>')
 api.add_resource(UserApi, '/users')
 api.add_resource(ChapterApi,'/users/<int:user_id>/dictionaries/<int:dictionary_id>/chapters')
-
+api.add_resource(WordApi, '/users/<int:user_id>/dictionaries/<int:dictionary_id>/chapters/<int:chapter_id>')
 api.init_app(app)
