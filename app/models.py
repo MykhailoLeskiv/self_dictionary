@@ -4,6 +4,22 @@ from datetime import datetime
 from app import db, login, ma, admin
 from werkzeug.security import generate_password_hash, check_password_hash
 from marshmallow import fields
+from app.languages_list import LANGUAGES
+import sqlalchemy.types as types
+
+class ChoiceType(types.TypeDecorator):
+
+    impl = types.String
+
+    def __init__(self, choices, **kw):
+        self.choices = dict(choices)
+        super(ChoiceType, self).__init__(**kw)
+
+    def process_bind_param(self, value, dialect):
+        return [k for k, v in self.choices.iteritems() if v == value][0]
+
+    def process_result_value(self, value, dialect):
+        return self.choices[value]
 
 
 @login.user_loader
@@ -29,11 +45,15 @@ class User(db.Model, UserMixin):
 
 
 class Dictionary(db.Model):
+    NATIVE_ENUM_LANG = LANGUAGES[:]
+    FOREIGN_ENUM_LANG = LANGUAGES[:]
+    NATIVE_ENUM_LANG.insert(0, ('-', 'Native language'))
+    FOREIGN_ENUM_LANG.insert(0, ('-', 'Foreign language'))
 
     id = db.Column(db.Integer, primary_key=True)
     user = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    native_lang = db.Column(db.String(32), index=True, nullable=False)
-    foreign_lang = db.Column(db.String(32), index=True, nullable=False)
+    native_lang = db.Column(ChoiceType(NATIVE_ENUM_LANG), nullable=False)
+    foreign_lang = db.Column(ChoiceType(FOREIGN_ENUM_LANG), nullable=False)
 
     def __repr__(self):
         return '<{} - {} dictionary>'.format(self.native_lang, self.foreign_lang)
@@ -65,7 +85,8 @@ class DictionaryAdminPageView(ModelView):
     column_display_pk = True
     column_hide_backrefs = False
     column_display_all_relations = True
-    form_columns = ('user', 'native_lang', 'foreign_lang')
+    form_choices = {'native_lang': Dictionary.NATIVE_ENUM_LANG, 'foreign_lang': Dictionary.FOREIGN_ENUM_LANG}
+    form_columns= ('user', 'native_lang', 'foreign_lang')
     column_list = ('user', 'native_lang', 'foreign_lang')
 
 class ChapterAdminPageView(ModelView):
