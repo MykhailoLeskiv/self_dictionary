@@ -11,14 +11,15 @@ user_schema = UserSchema()
 chapters_schema = ChapterSchema(many=True)
 chapter_schema = ChapterSchema
 
+
 class DictionaryApi(Resource):
 
-    def get(self,user_id):
-        dictionaries = Dictionary.query.all()
+    def get(self, user_id):
+        dictionaries = Dictionary.query.filter_by(user=user_id)
         dictionaries = dictionaries_schema.dump(dictionaries).data
         return {'status': 'success', 'data': dictionaries}, 200
 
-    def post(self,user_id):
+    def post(self, user_id):
         json_data = request.get_json(force=True)
         dictionary = Dictionary(
             user=user_id, native_lang=json_data['native_lang'], foreign_lang=json_data['foreign_lang']
@@ -28,7 +29,7 @@ class DictionaryApi(Resource):
         result = dictionary_schema.dump(dictionary).data
         return {"status": 'success', 'data': result}, 201
 
-    def put(self, user_id):
+    def put(self):
         json_data = request.get_json(force=True)
         if not json_data:
             return {'message': 'No input data provided'}, 400
@@ -41,7 +42,7 @@ class DictionaryApi(Resource):
         result = dictionary_schema.dump(dictionary).data
         return {"status": 'success', 'data': result}, 200
 
-    def delete(self,user_id):
+    def delete(self, user_id):
         json_data = request.get_json(force=True)
         if not json_data:
             return {'message': 'No input data provided'}, 400
@@ -103,32 +104,30 @@ class UserApi(Resource):
         db.session.commit()
         return {"status": 'success', 'data': {}}, 204
 
+
 class ChapterApi(Resource):
+
     def get(self, user_id, dictionary_id):
-        chapters = Chapter.query.all()
+        chapters = Chapter.query.filter_by(dictionary=dictionary_id)
         chapters = chapters_schema.dump(chapters).data
         return {'status': 'success', 'data': chapters}, 200
 
-    def post(self, user_id, dictionary_id):
+    def post(self, dictionary_id):
         json_data = request.get_json(force=True)
         if not json_data:
             return {'message': 'No input data provided'}, 400
-        # Validate and deserialize input
-        data, errors = user_schema.load(json_data)
-        if errors:
-            return errors, 422
-        chapter = Chapter.query.filter_by(id=data['id']).first()
+        chapter = Chapter.query.filter_by(id=json_data['id']).first()
         if chapter:
             return {'message': 'Chapter already exists'}, 400
         chapter = Chapter(
-            dictionary=json_data['dictionary'], chapter_name=json_data['chapter_name'])
+            dictionary=dictionary_id, chapter_name=json_data['chapter_name'])
 
         db.session.add(chapter)
         db.session.commit()
         result = chapter_schema.dump(chapter).data
         return {"status": 'success', 'data': result}, 201
 
-    def put(self, user_id, dictionary_id):
+    def put(self):
         json_data = request.get_json(force=True)
         if not json_data:
             return {'message': 'No input data provided'}, 400
@@ -140,7 +139,7 @@ class ChapterApi(Resource):
         result = chapter_schema.dump(chapter).data
         return {"status": 'success', 'data': result}, 200
 
-    def delete(self, user_id, dictionary_id):
+    def delete(self):
         json_data = request.get_json(force=True)
         if not json_data:
             return {'message': 'No input data provided'}, 400
