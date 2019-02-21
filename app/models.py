@@ -1,9 +1,13 @@
 from flask_admin.contrib.sqla import ModelView
 from flask_login import UserMixin
 from datetime import datetime
+
+from sqlalchemy_utils import ChoiceType
+
 from app import db, login, ma, admin
 from werkzeug.security import generate_password_hash, check_password_hash
 from marshmallow import fields
+from app.languages_list import LANGUAGES
 
 
 @login.user_loader
@@ -29,11 +33,15 @@ class User(db.Model, UserMixin):
 
 
 class Dictionary(db.Model):
+    NATIVE_ENUM_LANG = LANGUAGES[:]
+    FOREIGN_ENUM_LANG = LANGUAGES[:]
+    NATIVE_ENUM_LANG.insert(0, ('-', 'Native language'))
+    FOREIGN_ENUM_LANG.insert(0, ('-', 'Foreign language'))
 
     id = db.Column(db.Integer, primary_key=True)
     user = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    native_lang = db.Column(db.String(32), index=True, nullable=False)
-    foreign_lang = db.Column(db.String(32), index=True, nullable=False)
+    native_lang = db.Column(ChoiceType(NATIVE_ENUM_LANG, impl=db.String(2)), nullable=False)
+    foreign_lang = db.Column(ChoiceType(FOREIGN_ENUM_LANG, impl=db.String(2)), nullable=False)
 
     def __repr__(self):
         return '<{} - {} dictionary>'.format(self.native_lang, self.foreign_lang)
@@ -61,12 +69,15 @@ class Word(db.Model):
     def __repr__(self):
         return '<{} - {}>'.format(self.word,self.translation)
 
+
 class DictionaryAdminPageView(ModelView):
     column_display_pk = True
     column_hide_backrefs = False
     column_display_all_relations = True
-    form_columns = ('user', 'native_lang', 'foreign_lang')
-    column_list = ('user', 'native_lang', 'foreign_lang')
+    form_choices = {'native_lang': Dictionary.NATIVE_ENUM_LANG, 'foreign_lang': Dictionary.FOREIGN_ENUM_LANG}
+    form_columns = ('user', Dictionary.native_lang, Dictionary.foreign_lang)
+    column_list = ('user', Dictionary.native_lang, Dictionary.foreign_lang)
+
 
 class ChapterAdminPageView(ModelView):
     column_display_pk = True
@@ -74,6 +85,7 @@ class ChapterAdminPageView(ModelView):
     column_display_all_relations = True
     form_columns = ('dictionary', 'chapter_name')
     column_list = ('dictionary', 'chapter_name')
+
 
 class WordAdminPageView(ModelView):
     column_display_pk = True
@@ -108,6 +120,7 @@ class ChapterSchema(ma.Schema):
     dictionary = fields.Integer()
     created_datetime = fields.DateTime()
     chapter_name = fields.String()
+
 
 class WordSchema(ma.Schema):
     id = fields.Integer()
