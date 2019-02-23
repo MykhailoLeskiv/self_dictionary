@@ -109,3 +109,7 @@ venv.bak/
 # Ignore databases
 app/app.db
 app/test.db
+
+# frontend folders
+app/static/self_dictionary_frontend/build
+app/static/self_dictionary_frontend/node_modules
